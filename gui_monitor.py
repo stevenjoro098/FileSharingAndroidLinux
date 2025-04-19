@@ -1,0 +1,40 @@
+import tkinter as tk
+import qrcode
+from PIL import Image, ImageTk
+
+import shared_state
+import threading
+import time
+
+def generate_qr_image(ip="192.168.0.101", port=5000):
+    url = f"http://{ip}:{port}/share"
+    qr = qrcode.make(url)
+    return ImageTk.PhotoImage(qr)
+
+class MonitorApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title('LinkBridge Monitor')
+        self.root.geometry('400x200')
+
+        self.label = tk.Label(root, text='Waiting for data...', font=("Arial",14))
+
+        self.label.pack(expand=True, fill='both', padx=20, pady=20)
+
+        self.update_loop()
+
+        self.qr_img = generate_qr_image()
+        self.qr_label = tk.Label(root, image=self.qr_img)
+        self.qr_label.pack(pady=10)
+
+    def update_loop(self):
+        message = shared_state.get_message()
+        self.label.config(text=message if message else "Waiting for data...")
+        self.root.after(1000, self.update_loop)
+
+def run_gui():
+    root = tk.Tk()
+    app = MonitorApp(root)
+    root.mainloop()
+if __name__ == '__main__':
+    run_gui()
