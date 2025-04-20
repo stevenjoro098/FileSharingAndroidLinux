@@ -7,7 +7,7 @@ def test_flask_server():
     try:
         with open(file_path, 'rb') as f:
             files = {'file': (file_path, f)}
-            response = requests.post(url, files=files)  # ✅ POST request
+            response = requests.post(url, data={'content':'www.youtube.com'})  # ✅ POST request
 
         print(f"✅ Server responded with status: {response.status_code}")
         print("🔁 Response content:")

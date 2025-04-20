@@ -5,9 +5,12 @@ from PIL import Image, ImageDraw
 import pystray
 from pystray import MenuItem as item, Menu
 
-import shared_state
+from utils import shared_state
 from gui_monitor import run_gui
 from server.app import app
+from utils.shared_state import set_ip, get_ip
+
+
 # === IP Fetch ===
 def get_local_ip():
     try:
@@ -16,7 +19,7 @@ def get_local_ip():
         ip = s.getsockname()[0]
         s.close()
         return ip
-    except Exception:
+    except Exception as e:
         return "127.0.0.1"
 
 # === Tray Icon Image ===
@@ -28,14 +31,14 @@ def create_image():
 
 # === Server Start ===
 server_running = False
-
+server = 'Start Server'
 def start_flask(icon=None, item=None):
     global server_running
     if not server_running:
         threading.Thread(target=lambda: app.run(host="0.0.0.0", port=5000), daemon=True).start()
         server_running = True
         print("✅ Flask server started.")
-        icon.title = f"LinkBridge | IP: {get_local_ip()} | Running"
+        icon.title = f"ShareBridge | IP: {get_local_ip()} | Running"
     else:
         print("⚠️ Server already running.")
 
@@ -49,11 +52,11 @@ def open_gui(icon, item):
 
 # === Tray Icon ===
 icon = pystray.Icon(
-    "LinkBridge",
+    "ShareBridge",
     icon=create_image(),
-    title="LinkBridge | IP: (Detecting...)",
+    title="ShareBridge | IP: (Detecting...)",
     menu=Menu(
-        item("Start Server", start_flask),
+        item(server, start_flask),
         item("Show QR", open_gui),
         item("Quit", exit_app)
     )
@@ -66,10 +69,11 @@ def monitor_ip_change():
         new_ip = get_local_ip()
         if new_ip != current_ip:
             current_ip = new_ip
-            icon.title = f"LinkBridge | IP: {current_ip}"
+            icon.title = f"ShareBridge | IP: {current_ip}"
+            set_ip(current_ip)
         msg = shared_state.get_message()
         if msg:
-            icon.title = f"LinkBridge | {msg}"
+            icon.title = f"ShareBridge | {current_ip}|{msg}"
         time.sleep(5)
 
 # === Run ===

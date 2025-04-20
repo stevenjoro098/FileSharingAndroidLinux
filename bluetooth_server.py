@@ -1,5 +1,5 @@
 import bluetooth
-import shared_state
+from utils import shared_state
 
 server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 server_sock.bind(("", 1))

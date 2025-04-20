@@ -1,8 +1,5 @@
-import shared_state
-from flask import Flask, request
+from flask import Flask
 import queue
-
-from notifier import show_notification
 
 app = Flask(__name__)
 message_queue = queue.Queue()
@@ -13,10 +10,10 @@ def index():
 from flask import request, jsonify
 import os
 from werkzeug.utils import secure_filename
-from notifier import show_notification
-import shared_state
+from utils.notifier import show_notification
+from utils import shared_state
 
-UPLOAD_FOLDER = './uploads'
+UPLOAD_FOLDER = './server/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/share', methods=['POST'])
@@ -32,7 +29,7 @@ def share():
             message = f"📁 Received file: {filename}"
             shared_state.update_message(message)
             shared_state.message_queue.put(message)
-            show_notification("LinkBridge", message)
+            show_notification("ShareBridge", message)
 
             return jsonify({
                 "status": "success",
@@ -46,7 +43,7 @@ def share():
             message = f"📝 Received content: {content[:60]}{'...' if len(content) > 60 else ''}"
             shared_state.update_message(message)
             shared_state.message_queue.put(message)
-            show_notification("LinkBridge", message)
+            show_notification("ShareBridge", message)
 
             return jsonify({
                 "status": "success",
@@ -64,7 +61,7 @@ def share():
         error_msg = f"⚠️ Error: {str(e)}"
         shared_state.update_message(error_msg)
         shared_state.message_queue.put(error_msg)
-        show_notification("LinkBridge", error_msg)
+        show_notification("ShareBridge", error_msg)
         return jsonify({
             "status": "error",
             "message": "An unexpected error occurred.",
