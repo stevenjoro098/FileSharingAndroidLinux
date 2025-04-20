@@ -1,21 +1,32 @@
+import queue
 import tkinter as tk
 import qrcode
 from PIL import Image, ImageTk
 
 import shared_state
-import threading
-import time
+
+from app import message_queue
+
+
 
 def generate_qr_image(ip="192.168.0.101", port=5000):
     url = f"http://{ip}:{port}/share"
     qr = qrcode.make(url)
     return ImageTk.PhotoImage(qr)
+def listen_for_updates():
+    while True:
+        try:
+            msg = message_queue.get(timeout=1)  # Wait max 1 sec
+            print("Tray got message:", msg)
+            title = f"LinkBridge | {msg}"
+        except queue.Empty:
+            continue
 
 class MonitorApp:
     def __init__(self, root):
         self.root = root
         self.root.title('LinkBridge Monitor')
-        self.root.geometry('400x200')
+        self.root.geometry('400x400')
 
         self.label = tk.Label(root, text='Waiting for data...', font=("Arial",14))
 
