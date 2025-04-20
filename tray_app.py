@@ -4,11 +4,10 @@ import time
 from PIL import Image, ImageDraw
 import pystray
 from pystray import MenuItem as item, Menu
-from flask import Flask
 
 import shared_state
 from gui_monitor import run_gui
-from app import app
+from server.app import app
 # === IP Fetch ===
 def get_local_ip():
     try:

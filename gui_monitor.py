@@ -1,11 +1,11 @@
 import queue
 import tkinter as tk
 import qrcode
-from PIL import Image, ImageTk
+from PIL import ImageTk
 
 import shared_state
 
-from app import message_queue
+from server.app import message_queue
 
 
 
